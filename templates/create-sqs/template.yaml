@@ -4,7 +4,7 @@ metadata:
   name: create-sqs-template
   description: Criação de uma fila SQS com Terraform
 spec:
-  owner: anotaai-infrastructure
+  owner: infrastructure
   type: service
   templater: go-template  # Usando Go-Template para geração
   path: ./templates/create-sqs
