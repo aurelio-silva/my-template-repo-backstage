@@ -1,181 +1,74 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: nova-aplicação
-  title: Criar nova aplicação
-  description: Template para criar uma nova apliação diretamente no deploymentCatalog, lembre-se de utilizar as boas praticas e seguir a documentação
+  name: pull-request
+  title: Pull Request Action template - Nosso template 002
+  description: scaffolder v1beta3 template demo publishing to PR on existing git repository
 spec:
-  owner: ownerSlug
+  owner: backstage/techdocs-core
   type: service
+
   parameters:
-    - title: Informações do Projeto
+    - title: Fill in some steps
+      required:
+        - name
       properties:
         name:
-          title: Nome da Aplicação
+          title: Name
           type: string
-        ownerLayerSlug:
-          title: Time responsavel
-          type: string
-          enum:
-            - sre-anotaai
-            - pse-anotaai
-            - dbre-anotaai
-            - sec-anotaai
+          description: Unique name of the component
+          ui:field: EntityNamePicker
+          ui:autofocus: true
         description:
-          title: Breve descricao sobre a aplicacao
+          title: Description
           type: string
-        lifecycle:
-          title: Ciclo de Vida
+          description: Description of the component
+        targetPath:
+          title: Target Path in repo
           type: string
-          enum:
-            - development
-            - production
-            - deprecated
-        type:
-          title: Tipo
-          type: string
-          enum:
-            - service
-            - infrastructure
-            - other
-        impactLevel:
-          title: Nível de Impacto
-          type: integer
-          enum:
-            - 0
-            - 1
-            - 2
-            - 3
-            - 4
-            - 5
-        singlePodOnly:
-          title: Unico pod
-          description: Marque esta opcao apenas se sua aplicacao utilizara apenas um pod
-          type: boolean
-
-      steps:
-
-    - title: Definir recursos
+          description: Name of the directory to create in the repository
+    - title: Choose a location
+      required:
+        - repoUrl
       properties:
-        memory:
-          title: Quantidade de memoria
+        repoUrl:
+          title: Repository Location
           type: string
-          description: neste campo devera adicionar memoria para a producao em prod
+          ui:field: RepoUrlPicker
           ui:options:
-          rows: 50
-          
-        testing:
-          title: Select environments
-          type: array
-          items:
-            type: string
-            enum:
-              - production
-              - staging
-              - development
-          uniqueItems: true
-          ui:widget: checkboxes
+            allowedHosts:
+              - github.com
 
-          latest:
-            url:
-              title: url
-              type: string
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./template
+        values:
+          name: ${{parameters.name}}
 
+    - id: fetch-docs
+      name: Fetch Docs
+      action: fetch:plain
+      input:
+        targetPath: ./community
+        url: https://github.com/backstage/community/tree/main/backstage-community-sessions
 
-        multiline:
-          title: Text area input
-          type: string
-          description: Insert your multi line string
-          ui:widget: textarea
-          ui:options:
-            rows: 10
-          ui:help: 'Hint: Make it strong!'
-          ui:placeholder: |
-            apiVersion: backstage.io/v1alpha1
-              kind: Component
-              metadata:
-                name: backstage
-              spec:
-                type: library
-                owner: CNCF
-                lifecycle: experimental
+    - id: publish
+      name: Publish
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        title: "Create new project: ${{parameters.name}}"
+        branchName: create-${{parameters.name}}
+        description: |
+          # New project: ${{parameters.name}}
 
+          ${{ parameters.description if parameters.description }}
+        targetPath: ${{ parameters.targetPath if parameters.targetPath else parameters.name }}
 
-              - title: Fill in some steps
-
-        volume_type:
-          title: Volume Type
-          type: string
-          description: The volume type to be used
-          default: gp2
-          enum:
-            - gp2
-            - gp3
-            - io1
-            - io2
-            - sc1
-            - st1
-            - standard
-          enumNames:
-            - 'General Purpose SSD (gp2)'
-            - 'General Purpose SSD (gp3)'
-            - 'Provisioned IOPS (io1)'
-            - 'Provisioned IOPS (io2)'
-            - 'Cold HDD (sc1)'
-            - 'Throughput Optimized HDD (st1)'
-            - 'Magnetic (standard)'
-
-
-
-        arrayObjects:
-          title: Array with custom objects
-          type: array
-          minItems: 0
-          ui:options:
-            addable: true
-            orderable: true
-            removable: true
-          items:
-            type: object
-            properties:
-              array:
-                title: Array string with default value
-                type: string
-                default: value3
-                enum:
-                  - value1
-                  - value2
-                  - value3
-              flag:
-                title: Boolean flag
-                type: boolean
-                ui:widget: radio
-              someInput:
-                title: Simple text input
-                type: string
-
-
-        name:
-          title: Aplicacao com apenas um pod?
-          type: boolean
-          ui:widget: radio
-
-        features_name:
-          title: Select features
-          type: array
-          items:
-            type: boolean
-            enum:
-              - 'Enable scraping'
-              - 'Enable HPA'
-              - 'Enable cache'
-          uniqueItems: true
-          ui:widget: checkboxes
-
-
-        url:
-          title: Deseja adicionar alguma URL para
-          properties:
-            url:
-              title: url
-              type: string
+  output:
+    links:
+      - url: ${{steps.publish.output.remoteUrl}}
+        title: "Go to PR"
