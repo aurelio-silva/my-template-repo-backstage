@@ -1,4 +1,3 @@
-# arquivo responsvavel por receber infromacoes e fazer a criacao dos demais arquivos
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
@@ -7,6 +6,7 @@ metadata:
   description: Template para criar uma nova apliação diretamente no deploymentCatalog, lembre-se de utilizar as boas praticas e seguir a documentação
 spec:
   owner: ownerSlug
+  type: service
   parameters:
     - title: Informações do Projeto
       properties:
