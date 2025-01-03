@@ -160,7 +160,7 @@ spec:
           type: boolean
           ui:widget: radio
 
-        name:
+        features_name:
           title: Select features
           type: array
           items:
