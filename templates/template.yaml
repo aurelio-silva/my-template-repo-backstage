@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: pull-request
-  title: Pull Request Action template
+  title: Pull Request Action template - Nosso template
   description: scaffolder v1beta3 template demo publishing to PR on existing git repository
 spec:
   owner: backstage/techdocs-core
