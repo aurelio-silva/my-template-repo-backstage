@@ -1,0 +1,181 @@
+# arquivo responsvavel por receber infromacoes e fazer a criacao dos demais arquivos
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: nova-aplicação
+  title: Criar nova aplicação
+  description: Template para criar uma nova apliação diretamente no deploymentCatalog, lembre-se de utilizar as boas praticas e seguir a documentação
+spec:
+  owner: ownerSlug
+  parameters:
+    - title: Informações do Projeto
+      properties:
+        name:
+          title: Nome da Aplicação
+          type: string
+        ownerLayerSlug:
+          title: Time responsavel
+          type: string
+          enum:
+            - sre-anotaai
+            - pse-anotaai
+            - dbre-anotaai
+            - sec-anotaai
+        description:
+          title: Breve descricao sobre a aplicacao
+          type: string
+        lifecycle:
+          title: Ciclo de Vida
+          type: string
+          enum:
+            - development
+            - production
+            - deprecated
+        type:
+          title: Tipo
+          type: string
+          enum:
+            - service
+            - infrastructure
+            - other
+        impactLevel:
+          title: Nível de Impacto
+          type: integer
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+        singlePodOnly:
+          title: Unico pod
+          description: Marque esta opcao apenas se sua aplicacao utilizara apenas um pod
+          type: boolean
+
+      steps:
+
+    - title: Definir recursos
+      properties:
+        memory:
+          title: Quantidade de memoria
+          type: string
+          description: neste campo devera adicionar memoria para a producao em prod
+          ui:options:
+          rows: 50
+          
+        testing:
+          title: Select environments
+          type: array
+          items:
+            type: string
+            enum:
+              - production
+              - staging
+              - development
+          uniqueItems: true
+          ui:widget: checkboxes
+
+          latest:
+            url:
+              title: url
+              type: string
+
+
+        multiline:
+          title: Text area input
+          type: string
+          description: Insert your multi line string
+          ui:widget: textarea
+          ui:options:
+            rows: 10
+          ui:help: 'Hint: Make it strong!'
+          ui:placeholder: |
+            apiVersion: backstage.io/v1alpha1
+              kind: Component
+              metadata:
+                name: backstage
+              spec:
+                type: library
+                owner: CNCF
+                lifecycle: experimental
+
+
+              - title: Fill in some steps
+
+        volume_type:
+          title: Volume Type
+          type: string
+          description: The volume type to be used
+          default: gp2
+          enum:
+            - gp2
+            - gp3
+            - io1
+            - io2
+            - sc1
+            - st1
+            - standard
+          enumNames:
+            - 'General Purpose SSD (gp2)'
+            - 'General Purpose SSD (gp3)'
+            - 'Provisioned IOPS (io1)'
+            - 'Provisioned IOPS (io2)'
+            - 'Cold HDD (sc1)'
+            - 'Throughput Optimized HDD (st1)'
+            - 'Magnetic (standard)'
+
+
+
+        arrayObjects:
+          title: Array with custom objects
+          type: array
+          minItems: 0
+          ui:options:
+            addable: true
+            orderable: true
+            removable: true
+          items:
+            type: object
+            properties:
+              array:
+                title: Array string with default value
+                type: string
+                default: value3
+                enum:
+                  - value1
+                  - value2
+                  - value3
+              flag:
+                title: Boolean flag
+                type: boolean
+                ui:widget: radio
+              someInput:
+                title: Simple text input
+                type: string
+
+
+        name:
+          title: Aplicacao com apenas um pod?
+          type: boolean
+          ui:widget: radio
+
+        name:
+          title: Select features
+          type: array
+          items:
+            type: boolean
+            enum:
+              - 'Enable scraping'
+              - 'Enable HPA'
+              - 'Enable cache'
+          uniqueItems: true
+          ui:widget: checkboxes
+
+
+        url:
+          title: Deseja adicionar alguma URL para
+          properties:
+            url:
+              title: url
+              type: string
